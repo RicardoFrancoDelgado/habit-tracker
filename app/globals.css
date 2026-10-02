@@ -1,26 +1,403 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Nocturne tokens (from the Claude Design system) */
+@theme {
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --color-bg: #161826;
+  --color-surface: #232532;
+  --color-text: #e9e9ed;
+  --color-divider: color-mix(in srgb, #e9e9ed 16%, transparent);
+  --color-neutral-100: #f3f5fe;
+  --color-neutral-200: #e4e7f5;
+  --color-neutral-300: #cfd3e5;
+  --color-neutral-400: #b2b6ca;
+  --color-neutral-500: #9397ab;
+  --color-neutral-600: #75798c;
+  --color-neutral-700: #595d6c;
+  --color-neutral-800: #3f424d;
+  --color-neutral-900: #292b31;
+  --color-accent-100: #f5f4ff;
+  --color-accent-200: #e7e5fe;
+  --color-accent-300: #d2cefd;
+  --color-accent-400: #b5abfc;
+  --color-accent-500: #968ae0;
+  --color-accent-600: #796cbf;
+  --color-accent-700: #5d5294;
+  --color-accent-800: #423a6a;
+  --color-accent-900: #2b2741;
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+
+  --space-1: 2.8px;
+  --space-2: 5.6px;
+  --space-3: 8.4px;
+  --space-4: 11.2px;
+  --space-6: 16.8px;
+  --space-8: 22.4px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-md: 0 0 0 1px #595d6c, 0 6px 18px rgba(0, 0, 0, 0.55);
+
+  /* shadcn tokens, mapped onto Nocturne */
+  --radius: 0.625rem;
+  --background: #161826;
+  --foreground: #e9e9ed;
+  --card: #232532;
+  --card-foreground: #e9e9ed;
+  --popover: #232532;
+  --popover-foreground: #e9e9ed;
+  --primary: #9184d9;
+  --primary-foreground: #161826;
+  --secondary: #232532;
+  --secondary-foreground: #e9e9ed;
+  --muted: #3f424d;
+  --muted-foreground: #b2b6ca;
+  --accent: color-mix(in srgb, #9184d9 14%, transparent);
+  --accent-foreground: #e9e9ed;
+  --destructive: #f28b82;
+  --border: color-mix(in srgb, #e9e9ed 16%, transparent);
+  /* 3:1 against the surface, so the field edge is visible without relying on the fill. */
+  --input: color-mix(in srgb, #e9e9ed 45%, transparent);
+  --ring: #9184d9;
+  --chart-1: #9184d9;
+  --chart-2: #b5abfc;
+  --chart-3: #796cbf;
+  --chart-4: #5d5294;
+  --chart-5: #423a6a;
+  --sidebar: #161826;
+  --sidebar-foreground: #e9e9ed;
+  --sidebar-primary: #9184d9;
+  --sidebar-primary-foreground: #161826;
+  --sidebar-accent: color-mix(in srgb, #9184d9 14%, transparent);
+  --sidebar-accent-foreground: #e9e9ed;
+  --sidebar-border: color-mix(in srgb, #e9e9ed 16%, transparent);
+  --sidebar-ring: #9184d9;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+button {
+  font-family: inherit;
+}
+a {
+  color: var(--primary);
+  text-underline-offset: 3px;
+}
+a:hover {
+  color: var(--color-accent-300);
+}
+:focus {
+  outline: none;
+}
+:focus-visible:not([data-slot]) {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+::selection {
+  background: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+input[type="number"]::-webkit-inner-spin-button {
+  opacity: 0.4;
+}
+
+/* The notebook page: ruled lines that fade at the ends (as the Nocturne rules do) and a lilac margin line. */
+.notebook {
+  position: relative;
+  padding-left: 40px;
+}
+.notebook::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 23px,
+    color-mix(in srgb, var(--color-text) 11%, transparent) 23px,
+    color-mix(in srgb, var(--color-text) 11%, transparent) 24px
+  );
+  mask-image: linear-gradient(to right, transparent, var(--color-text) 48px, var(--color-text) calc(100% - 48px), transparent);
+}
+.notebook::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 28px;
+  width: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--primary) 40%, transparent) 24px,
+    color-mix(in srgb, var(--primary) 40%, transparent) calc(100% - 24px),
+    transparent
+  );
+}
+.notebook:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+.notebook-text {
+  display: block;
+  width: 100%;
+  min-height: 168px;
+  margin: 0;
+  padding: 0 var(--space-2) 0 0;
+  overflow: hidden;
+  resize: none;
+  font: inherit;
+  font-size: 15px;
+  line-height: 24px;
+  color: var(--color-text);
+  caret-color: var(--primary);
+  background: transparent;
+  border: 0;
+  outline: none;
+}
+.notebook-text::placeholder {
+  color: var(--color-neutral-500);
+}
+
+@theme inline {
+  --font-heading: var(--font-inter), system-ui, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+@utility elev-md {
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------- Motion ----------
+   One authored moment: ticking a habit lights it, and closing the day lights the whole page.
+   Everything else is quiet feedback. Reduced motion drops the travel and keeps the color changes. */
+
+@keyframes view-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.view-enter { animation: view-in 260ms var(--ease-out) both; }
+
+@keyframes row-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.row-in {
+  animation: row-in 320ms var(--ease-out) both;
+  animation-delay: calc(min(var(--i, 0), 7) * 40ms);
+}
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.fade-in { animation: fade-in 200ms var(--ease-out) both; }
+
+/* A ticked marker: the check lands, a ring of light leaves it, the row warms and settles. */
+@keyframes check-pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.18); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.check-pop { animation: check-pop 360ms var(--ease-out) both; }
+
+@keyframes light-ring {
+  from { transform: scale(1); opacity: 0.75; }
+  to { transform: scale(2.3); opacity: 0; }
+}
+.light-ring {
+  position: absolute;
+  inset: -1.5px;
+  border: 1.5px solid var(--primary);
+  border-radius: inherit;
+  pointer-events: none;
+  animation: light-ring 640ms var(--ease-out) both;
+}
+
+@keyframes row-warm {
+  from { background-color: color-mix(in srgb, var(--primary) 16%, var(--card)); }
+  to { background-color: var(--card); }
+}
+.row-warm { animation: row-warm 900ms var(--ease-out) both; }
+@keyframes row-glow {
+  from { box-shadow: 0 0 0 1px var(--color-accent-600), 0 0 18px color-mix(in srgb, var(--primary) 40%, transparent); }
+  to { box-shadow: 0 0 0 1px var(--color-accent-600), 0 0 0 transparent; }
+}
+.row-warm.row-glow { animation: row-warm 900ms var(--ease-out) both, row-glow 900ms var(--ease-out) both; }
+
+/* A number that moved: it drops in from above. */
+@keyframes tick-in {
+  from { opacity: 0; transform: translateY(-40%); }
+  to { opacity: 1; transform: none; }
+}
+.tick-in { display: inline-block; animation: tick-in 240ms var(--ease-out) both; }
+
+@keyframes nudge {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+.nudge { display: inline-block; animation: nudge 260ms var(--ease-out) both; }
+
+@keyframes select-pop {
+  0% { transform: scale(0.82); }
+  100% { transform: scale(1); }
+}
+[data-slot="toggle-group-item"][data-state="on"] > i { animation: select-pop 260ms var(--ease-out) both; }
+
+/* The day, closed: the bar flashes, a handful of lights leave it, the line appears. */
+@keyframes bar-flash {
+  0% { filter: drop-shadow(0 0 0 transparent); }
+  30% { filter: drop-shadow(0 0 9px var(--primary)); }
+  100% { filter: drop-shadow(0 0 0 transparent); }
+}
+.bar-flash { animation: bar-flash 900ms var(--ease-out) both; }
+
+.burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.burst > i {
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-accent-300);
+  box-shadow: 0 0 6px var(--primary);
+  animation: burst 900ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes burst {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+}
+
+@keyframes lit-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+.lit-in { animation: lit-in 420ms var(--ease-out) 120ms both; }
+
+@keyframes glint {
+  0% { transform: scale(0.5) rotate(-30deg); opacity: 0; }
+  60% { transform: scale(1.2) rotate(8deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+.glint { display: inline-block; animation: glint 520ms var(--ease-out) both; }
+
+/* Toast arrives from below; a progress that fills does it with a long ease-out. */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.toast-in { animation: toast-in 280ms var(--ease-out) both; }
+
+/* Stats: bars rise from the baseline, the heat map is lit from left to right, the trend is drawn left to right. */
+@keyframes rise {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+.rise { transform-origin: bottom; animation: rise 620ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 35ms); }
+
+@keyframes cell-in {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: none; }
+}
+.cell-in { animation: cell-in 360ms var(--ease-out) both; animation-delay: calc(var(--w, 0) * 14ms); }
+
+@keyframes draw {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(-10% -2% -10% -2%); }
+}
+.draw { animation: draw 900ms var(--ease-out) 150ms both; }
+
+@keyframes badge-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+.badge-in { animation: badge-in 380ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 45ms); }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+  /* Travel and scale go; opacity and color changes stay, so a tick still reads. */
+  .view-enter, .row-in, .toast-in, .badge-in, .lit-in { animation-name: fade-in; animation-delay: 0ms; }
+  .check-pop, .nudge, .glint, .tick-in, .rise, .cell-in, .draw { animation: none; }
+  .light-ring, .burst { display: none; }
+  .row-warm { animation-duration: 1ms; }
+  [data-slot="toggle-group-item"][data-state="on"] > i { animation: none; }
+  [data-slot="progress-indicator"] { transition-property: background-color, box-shadow !important; }
 }
